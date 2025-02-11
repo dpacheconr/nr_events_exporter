@@ -1,6 +1,6 @@
-## New Relic Logs exporter
+## New Relic events exporter
 
-Export New Relic logs into CSV
+Export New Relic events into CSV
 
 ## How to 
 
