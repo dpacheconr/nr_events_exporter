@@ -1,15 +1,39 @@
 ## New Relic events exporter
 
-Export New Relic events into CSV
+Export New Relic events into CSV file (or S3 bucket)
 
-## How to 
+## ⚙️ Setup Instructions
 
-Install required packages to run script
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/dpacheconr/nr_events_exporter
+cd nr_events_exporter
+```
 
-`pip3 install -r requirements.txt`
+### 2️⃣ Create a Virtual Environment
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-Rename .env-sample to .env and update environment variables as per your environment
+### 3️⃣ Install Dependencies
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
 
-Then run the script with 
+### 4️⃣ Configure Environment Variables
+```bash
+cp .env-sample .env
+```
+Update the `.env` file as required for your use case.
 
-`python3 exporter.py`
+### 5️⃣ Run the Script
+```bash
+python3 exporter.py
+```
+
+### 6️⃣ Deactiveate virtual environment
+```bash
+deactivate
+```
