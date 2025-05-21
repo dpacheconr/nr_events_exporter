@@ -5,3 +5,5 @@ humanize
 boto3
 botocore
 python-dotenv
+requests
+api-calls
