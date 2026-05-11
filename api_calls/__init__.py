@@ -55,10 +55,12 @@ def make_request_total(s_since,s_until):
             }
             response = requests.post('https://api.newrelic.com/graphql', headers=headers, json=json_data, timeout=30)
             logging.info("Response: "+str(response.json()))
-            if total_results_return :
-                data = json.loads(json.dumps(response.json()['data']['actor']['account']['nrql']['totalResult']['count']))
+            nrql_response = response.json()['data']['actor']['account']['nrql']
+            total_result = nrql_response.get('totalResult') if total_results_return else None
+            if total_result is not None:
+                data = json.loads(json.dumps(total_result['count']))
             else:
-                data = json.loads(json.dumps(response.json()['data']['actor']['account']['nrql']['results'][0]['count']))
+                data = json.loads(json.dumps(nrql_response['results'][0]['count']))
             total_number_records=data
             logging.info("Total number records in select period is: "+ str(total_number_records))
             

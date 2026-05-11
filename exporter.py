@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import time
 import pandas as pd
@@ -105,7 +106,7 @@ def main():
     logging.info("Exporting to CSV")
     records_in_csv = generate_csv ()
         
-    if number_errors_occured <=0 or fatal_errors<=1:
+    if number_errors_occured <= 0 and fatal_errors <= 0:
         logging.info("No errors ocurred")
     else:
         if not REMOVE_DUPLICATES:
@@ -131,10 +132,20 @@ def main():
     logging.info("Total amount time it took to run script "+str(datetime.timedelta(seconds=(time.time() - start_time)))+ " minutes")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--debug", action="store_true", help="Write logs to file")
+    args = parser.parse_args()
+
+    if args.debug:
+        file_handler = logging.FileHandler(logfilename)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+        logging.getLogger().addHandler(file_handler)
+        logging.info(f"Debug mode enabled, logging to {logfilename}")
+
     for i in range(1,num_retries+1):
         main()
         if not retry:
-           break         
-       
+           break
+
         if i == num_retries:
             logging.exception("FATAL ERROR OCURRED, UNABLE TO OBTAIN DATA FROM NEW RELIC, TRY AGAIN LATER")

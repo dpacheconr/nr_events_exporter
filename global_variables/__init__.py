@@ -3,6 +3,7 @@ import logging
 import threading
 from queue import Queue
 import os
+import re
 from dotenv import load_dotenv
 
 # Load environment variables from .env
@@ -56,7 +57,7 @@ if "QUERY_TOTAL" in os.environ and os.getenv('QUERY_TOTAL') != "":
     query=query.replace("SELECT","SELECT eventtype(),")
     total_results_return = True
 else:
-    query_total= query.replace("*","count(*)")
+    query_total = re.sub(r'(?i)SELECT\s+.+?\s+FROM\s', 'SELECT count(*) FROM ', query)
     total_results_return = False
     
 logging.info("Query total: "+query_total)

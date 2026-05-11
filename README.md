@@ -33,6 +33,11 @@ Update the `.env` file as required for your use case.
 python3 exporter.py
 ```
 
+Add `--debug` to write logs to a timestamped file (`log_YYYY-MM-DD_HH-MM-SS.txt`):
+```bash
+python3 exporter.py --debug
+```
+
 ### 6️⃣ Deactiveate virtual environment
 ```bash
 deactivate
