@@ -157,8 +157,23 @@ async def worker():
                         tasks.append(asyncio.ensure_future(make_request_timeseries_async(session,c_since,c_until,"1 minute",1)))
                     elif c_iteration == 2:
                         tasks.append(asyncio.ensure_future(make_request_timeseries_async(session,c_since,c_until,"1 second",2)))
+                    elif c_iteration == 3:
+                        tasks.append(asyncio.ensure_future(make_request_timeseries_async(session,c_since,c_until,"MAX",3)))
                     else:
-                        tasks.append(asyncio.ensure_future(make_request_timeseries_async(session,c_since,c_until,"MAX",3))) # still needs testing as never hit this on any query, so may fail
+                        # >1999 records in a single second and MAX can't subdivide further
+                        # Accept the bucket and let the raw data fetch retrieve up to LIMIT MAX records
+                        logging.warning(
+                            "HIGH DENSITY BUCKET DETECTED - cannot subdivide further. "
+                            "Window: "+str(datetime.datetime.fromtimestamp(int(c_since)))+" to "+str(datetime.datetime.fromtimestamp(int(c_until)))+" "
+                            "("+str(int(c_until)-int(c_since))+"s). "
+                            "Records in window: "+str(c_data["count"])+". "
+                            "Iteration level reached: "+str(c_iteration)+". "
+                            "Series tried: 1 day > 1 hour > 1 minute > 1 second > MAX. "
+                            "Raw data fetch for this window will be capped at 2000 records by New Relic LIMIT MAX. "
+                            "To avoid truncation, narrow your query with additional WHERE filters."
+                        )
+                        current_total+=c_data["count"]
+                        timestamps_processed.append(c_data)
             else:
                 if c_data["count"] != 0:
                     current_total+=c_data["count"]
