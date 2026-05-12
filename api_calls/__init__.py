@@ -64,8 +64,8 @@ def make_request_total(s_since,s_until):
             total_number_records=data
             logging.info("Total number records in select period is: "+ str(total_number_records))
             
-        except:
-            logging.error("Unable to obtain total number records from API, will retry")
+        except Exception as e:
+            logging.error("Unable to obtain total number records from API, will retry. Error: "+str(e))
             response=None
             continue
     return total_number_records
@@ -98,8 +98,8 @@ async def make_request(session,i):
                 else:
                     data = None
         
-        except:
-            logging.error("Unable to obtain raw data for this iteration, will retry")
+        except Exception as e:
+            logging.error("Unable to obtain raw data for this iteration, will retry. Error: "+str(e))
             data = None
             continue
 
@@ -118,19 +118,23 @@ async def make_request_timeseries_async(session,unix_time_since,unix_time_to,ser
             'API-Key': NEW_RELIC_API_KEY,
             }
             json_data = {
-            'query': '{\n actor {\n account(id: '+NEW_ACCOUNT_ID+') {\n nrql(query: "'+query_total+' since '+str(int(c_since))+' until '+str(int(c_until))+' TIMESERIES '+series+'") {\nresults\n }\n }\n }\n}\n',
+            'query': '{\n actor {\n account(id: '+NEW_ACCOUNT_ID+') {\n nrql(query: "'+query_total+' since '+str(int(c_since))+' until '+str(int(c_until))+' TIMESERIES '+series+' LIMIT MAX") {\nresults\n }\n }\n }\n}\n',
             'variables': '',
             }
             
             async with session.post('https://api.newrelic.com/graphql',headers=headers,json=json_data, timeout=30) as resp:
                 response = await resp.json()
+                if response.get('errors') or response['data']['actor']['account']['nrql'] is None:
+                    logging.error("API returned error for timeseries query: "+str(response.get('errors', response)))
+                    response = None
+                    continue
                 data = response['data']['actor']['account']['nrql']['results']
                 c_iteration+=1
                 for item in data:
                     c_data=item
                     requests_queue.put([c_data,c_iteration,series,iteration])        
-        except:
-            logging.error("Unable to obtain data from API for this timeseries -> "+str(datetime.datetime.fromtimestamp(int(c_since))) + " and " + str(datetime.datetime.fromtimestamp(int(c_until)))+ ", will retry.")
+        except Exception as e:
+            logging.error("Unable to obtain data from API for this timeseries -> "+str(datetime.datetime.fromtimestamp(int(c_since))) + " and " + str(datetime.datetime.fromtimestamp(int(c_until)))+ ", will retry. Error: "+str(e))
      
 async def worker():
     global timestamps_processed
