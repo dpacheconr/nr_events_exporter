@@ -149,7 +149,7 @@ async def worker():
             c_iteration=data[1]
             c_since =c_data["beginTimeSeconds"]
             c_until=c_data["endTimeSeconds"]
-            if c_data["count"] > 1999:
+            if c_data["count"] > 4999:
                 if duration >= 1296000: # check if it's more than 15 days, more than 366 buckets
                     tasks.append(asyncio.ensure_future(make_request_timeseries_async(session,c_since,c_until,"1 hour",0)))
                 else:
@@ -169,7 +169,7 @@ async def worker():
                             "Records in window: "+str(c_data["count"])+". "
                             "Iteration level reached: "+str(c_iteration)+". "
                             "Series tried: 1 day > 1 hour > 1 minute > 1 second > MAX. "
-                            "Raw data fetch for this window will be capped at 2000 records by New Relic LIMIT MAX. "
+                            "Raw data fetch for this window will be capped at 5000 records by New Relic LIMIT MAX. "
                             "To avoid truncation, narrow your query with additional WHERE filters."
                         )
                         current_total+=c_data["count"]
