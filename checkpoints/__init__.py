@@ -35,7 +35,7 @@ def sort_timestamps(lst,out_lst):
         if idx != (len(lst)-1):
             if new_start == "":
                     new_start=str(item["beginTimeSeconds"])
-            if current_count+item["count"] < 1999:
+            if current_count+item["count"] < 4999:
                 current_count=current_count+item['count']
             else:
                 if new_start == "":
@@ -47,7 +47,7 @@ def sort_timestamps(lst,out_lst):
                 new_start=str(lst[idx-1]['endTimeSeconds'])
                 last_idx_processed=idx
         else:
-            if current_count+item["count"] < 1999:
+            if current_count+item["count"] < 4999:
                 current_count=current_count+item['count']
                 new_end=str(item["endTimeSeconds"])
                 out_lst.append({'beginTimeSeconds': str(new_start), 'endTimeSeconds': str(new_end), 'count': current_count})
